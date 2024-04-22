@@ -26,9 +26,33 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_below="@id/btnMessage"
-        android:layout_marginTop="16dp"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
         android:src="@drawable/circular_placeholder" />
+
+    <LinearLayout
+        android:id="@+id/buttonContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/profilePicture"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnFollow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Follow"
+            android:onClick="onFollowClick" />
+
+        <Button
+            android:id="@+id/btnAddPost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+"
+            android:onClick="onAddPostClick" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/followerCount"
@@ -52,7 +76,7 @@
         android:id="@+id/imageGrid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/profilePicture"
+        android:layout_below="@id/buttonContainer"
         android:layout_marginTop="16dp"
         android:numColumns="3"
         android:verticalSpacing="10dp"
