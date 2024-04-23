@@ -1,5 +1,6 @@
 package com.example.instagramapplication.adapters
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.instagramapplication.R
+//import com.example.instagramapplication.UserPostDetailActivity
 import com.example.instagramapplication.models.Post
 import com.squareup.picasso.Picasso
 
@@ -31,7 +33,16 @@ class PostAdapter(private val posts: List<Post>) : RecyclerView.Adapter<PostAdap
         holder.tvLocation.text = post.location
         holder.tvLikeCount.text = "${post.likes} likes"
         Picasso.get().load(post.imageUrl).into(holder.imgPostImage)
-        // Set image for imgPostImage and icHeart if needed
+//        Picasso.get().load(post.imageUrl).into(holder.imgPostImage)
+//
+//        holder.itemView.setOnClickListener {
+//            val context = it.context
+//            val intent = Intent(context, UserPostDetailActivity::class.java).apply {
+//                putExtra("Post", post)
+//            }
+//            context.startActivity(intent)
+//
+//        }
     }
 
     override fun getItemCount() = posts.size

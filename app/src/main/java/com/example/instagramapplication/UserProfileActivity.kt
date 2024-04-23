@@ -72,8 +72,8 @@ class UserProfileActivity : AppCompatActivity() {
 
     private fun onMessageClick() {
         // Navigate to the message screen
-//        val intent = Intent(this, MessageActivity::class.java)
-//        startActivity(intent)
+        val intent = Intent(this, ChatActivity::class.java)
+        startActivity(intent)
     }
 
     private fun onSettingsClick() {

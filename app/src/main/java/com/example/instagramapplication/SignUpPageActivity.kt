@@ -9,6 +9,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.instagramapplication.models.Post
+import com.example.instagramapplication.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
@@ -27,6 +28,9 @@ class SignUpPageActivity: AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
 
         // Get references to the EditTexts and Button
+        val firstNameEditText = findViewById<EditText>(R.id.first_name)
+        val lastNameEditText = findViewById<EditText>(R.id.last_name)
+        val userNameEditText = findViewById<EditText>(R.id.username)
         val emailEditText = findViewById<EditText>(R.id.email)
         val passwordEditText = findViewById<EditText>(R.id.password)
         val signUpButton = findViewById<Button>(R.id.enter_button)
@@ -34,6 +38,9 @@ class SignUpPageActivity: AppCompatActivity() {
         // Set up the button click listener
         signUpButton.setOnClickListener {
             // Get text from EditTexts and convert them to strings
+            val firstName = firstNameEditText.text.toString().trim();
+            val lastName = lastNameEditText.text.toString().trim();
+            val userName = userNameEditText.text.toString().trim();
             val email = emailEditText.text.toString().trim()
             val password = passwordEditText.text.toString().trim()
 
@@ -44,7 +51,19 @@ class SignUpPageActivity: AppCompatActivity() {
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
                             // Sign up success, update UI with the signed-in user's information
-                            val user = auth.currentUser
+                            val user = User(
+                                userId = auth.currentUser?.uid ?: "",
+                                name = "$firstName $lastName",
+                                emailId = email,
+                                username = userName,
+                                bio = "",
+                                profilePictureUrl = "",
+                                followersCount = 0,
+                                followingCount = 0,
+                                posts = listOf()
+                            )
+
+
                             // Optionally, you can add additional user information here (such as first and last names)
                             Toast.makeText(this, "Sign up successful!", Toast.LENGTH_SHORT).show()
                             if (user != null) {
@@ -65,7 +84,7 @@ class SignUpPageActivity: AppCompatActivity() {
 
     }
 
-    private fun updateUI(user: FirebaseUser?) {
+    private fun updateUI(user: User?) {
         if (user != null) {
             // User is signed in successfully, navigate to the HomePageActivity
             val intent = Intent(this, UserHomeActivity::class.java)
@@ -77,29 +96,29 @@ class SignUpPageActivity: AppCompatActivity() {
         }
     }
 
-    private fun createUserRecord(firebaseUser: FirebaseUser, isNewUser: Boolean) {
-        val email = firebaseUser.email ?: ""
-        val username = email.substringBefore("@")
-        val name = firebaseUser.displayName ?: ""
-        val firstName = name.substringBefore(" ")
-        val lastName = name.substringAfter(" ", "")
+    private fun createUserRecord(user: User, isNewUser: Boolean) {
+        val email = user.emailId
+        val name = user.name
         val posts: List<Post> = listOf()
+        val userName = user.username
+        val userId = user.userId
+
 
         // Save user details in SharedPreferences
         val prefs = this.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
         prefs.edit().apply {
-            putString("userId", firebaseUser.uid)
-            putString("username", username)
+            putString("userId", user.userId)
+            putString("username", userName)
             apply()
         }
 
         if (isNewUser) {
             // Create a new user with a first and last name
             val user = hashMapOf(
-                "userId" to firebaseUser.uid,
+                "userId" to user.userId,
                 "name" to name,
                 "emailid" to email,
-                "username" to username,
+                "username" to userName,
                 "bio" to "sampleBioForUser",
                 "profilePictureUrl" to "",  // Blank or some default URL if you have one
                 "followersCount" to 0,
@@ -108,7 +127,7 @@ class SignUpPageActivity: AppCompatActivity() {
             )
 
             // Add a new document with a generated ID to Firestore
-            db.collection("users").document(firebaseUser.uid).set(user)
+            db.collection("users").document(userId).set(user)
                 .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully written!") }
                 .addOnFailureListener { e -> Log.w(TAG, "Error writing document", e) }
         }

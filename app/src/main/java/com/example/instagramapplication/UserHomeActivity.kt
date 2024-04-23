@@ -2,6 +2,7 @@ package com.example.instagramapplication
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -9,23 +10,50 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.instagramapplication.adapters.PostAdapter
 import com.example.instagramapplication.models.Post
+import com.google.firebase.firestore.FirebaseFirestore
 
 class UserHomeActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var postAdapter: PostAdapter
-    private var posts: List<Post> = listOf(
-        Post("Alice", "New York", 150, "https://example.com/image1.jpg"),
-        Post("Bob", "San Francisco", 95, "https://example.com/image2.jpg"),
-        Post("Charlie", "London", 200, "https://example.com/image3.jpg")
-    ) // Example posts
+    //    private var posts: List<Post> = listOf(
+//        Post("12", "Alice", "New York", 150, "https://example.com/image1.jpg"),
+//        Post("123", "Bob", "San Francisco", 95, "https://example.com/image2.jpg"),
+//        Post("1234", "Charlie", "London", 200, "https://example.com/image3.jpg")
+//    ) // Example posts
+    val allPosts = mutableListOf<Post>()
+    val posts = mutableListOf<Post>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.user_home)
 
+        getAllPosts()
         setupRecyclerView()
         setupNavigationBar()
+    }
+
+    fun getAllPosts() {
+        val usersCollection = FirebaseFirestore.getInstance().collection("users")
+
+        usersCollection.get().addOnSuccessListener { userDocuments ->
+            for (userDocument in userDocuments) {
+                val postsCollection = usersCollection.document(userDocument.id).collection("posts")
+                postsCollection.get().addOnSuccessListener { postDocuments ->
+                    for (postDocument in postDocuments) {
+                        val post = postDocument.toObject(Post::class.java).apply {
+                            postId = postDocument.id // Ensure you have postId as part of your Post data class
+                        }
+                        allPosts.add(post)
+                        posts.add(post)
+                    }
+                }.addOnFailureListener { e ->
+                    Log.e("getAllPosts", "Error getting posts for user ${userDocument.id}", e)
+                }
+            }
+        }.addOnFailureListener { e ->
+            Log.e("getAllPosts", "Error getting users", e)
+        }
     }
 
     private fun setupRecyclerView() {

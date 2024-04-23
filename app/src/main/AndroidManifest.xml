@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Permissions for camera and external storage -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -36,6 +38,18 @@
         <activity android:name=".UserHomeActivity" />
         <activity android:name=".UserProfileActivity" />
         <activity android:name=".ShopActivity" />
+        <activity android:name=".ChatActivity" />
+
+
+<!--        <provider-->
+<!--            android:name="androidx.core.content.FileProvider"-->
+<!--            android:authorities="edu.utap.fragment.provider"-->
+<!--            android:exported="false"-->
+<!--            android:grantUriPermissions="true">-->
+<!--            <meta-data-->
+<!--                android:name="android.support.FILE_PROVIDER_PATHS"-->
+<!--                android:resource="@xml/file_paths" />-->
+<!--        </provider>-->
 
 
     </application>
