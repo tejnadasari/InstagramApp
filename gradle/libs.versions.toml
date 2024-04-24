@@ -1,6 +1,6 @@
 [versions]
 agp = "8.3.2"
-googleServices = "4.4.1"  # Google Services Plugin version
+googleServices = "4.4.1"
 kotlin = "1.9.0"
 coreKtx = "1.13.0"
 junit = "4.13.2"
@@ -15,6 +15,7 @@ picasso = "2.71828"
 firebaseFirestore = "24.11.1"
 firebaseStorage = "20.3.0"
 firebaseFirestoreKtx = "24.11.1"
+constraintLayout = "2.0.4"
 
 [libraries]
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
@@ -32,6 +33,7 @@ firebase-firestore-ktx = { module = "com.google.firebase:firebase-firestore-ktx"
 firebase-storage = { module = "com.google.firebase:firebase-storage", version.ref = "firebaseStorage" }
 glide = { module = "com.github.bumptech.glide:glide", version = "4.16.0" }
 glideCompiler = { module = "com.github.bumptech.glide:compiler", version = "4.16.0" }
+androidx-constraintLayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintLayout" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version = "2.9.0" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version = "2.9.0" }
 

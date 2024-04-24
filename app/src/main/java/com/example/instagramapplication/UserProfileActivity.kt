@@ -8,8 +8,12 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Button
 import android.Manifest
-import android.content.Context
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.content.Context
+import android.graphics.Rect
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,9 +21,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.squareup.picasso.Picasso
 import java.io.ByteArrayOutputStream
 import java.util.UUID
 
@@ -28,6 +35,9 @@ class UserProfileActivity : AppCompatActivity() {
     private lateinit var cameraResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var galleryResultLauncher: ActivityResultLauncher<Intent>
 
+    private lateinit var postsRecyclerView: RecyclerView
+    private lateinit var gridAdapter: GridAdapter
+    private var imageUrls = mutableListOf<String>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.user_profile)
@@ -47,6 +57,16 @@ class UserProfileActivity : AppCompatActivity() {
             loadProfile()
         }
 
+        postsRecyclerView = findViewById(R.id.postsRecyclerView)
+
+        val spacingInPixels = 2 // replace with Resources.getDimensionPixelSize(R.dimen.spacing) if you define it in XML
+        postsRecyclerView.addItemDecoration(GridSpacingItemDecoration(3, spacingInPixels))
+
+
+        gridAdapter = GridAdapter(imageUrls) // Initially, the list is empty
+        postsRecyclerView.adapter = gridAdapter
+        postsRecyclerView.layoutManager = GridLayoutManager(this, 3) // We want 3 columns
+
         cameraResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK) {
                 handleCameraResult(result.data)
@@ -58,8 +78,22 @@ class UserProfileActivity : AppCompatActivity() {
                 handleGalleryResult(result.data)
             }
         }
-
         setupButtonListeners()
+        loadUserImages() // Load images when the activity is created
+    }
+
+    private fun loadUserImages() {
+        // Assume you have a method to get the userId
+        val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
+        FirebaseFirestore.getInstance().collection("users").document(userId).collection("posts")
+            .get()
+            .addOnSuccessListener { documents ->
+                val imageUrls = documents.mapNotNull { it.getString("imageUrl") }
+                gridAdapter.updateData(imageUrls) // Update adapter's data
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error loading images: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun setupButtonListeners() {
@@ -258,6 +292,53 @@ class UserProfileActivity : AppCompatActivity() {
         private const val REQUEST_CAMERA_PERMISSION = 1001
     }
 
-
-
 }
+
+// Adapter for the RecyclerView
+class GridAdapter(private var items: List<String>) : RecyclerView.Adapter<GridAdapter.ViewHolder>() {
+
+    // Call this method when you have new data to show
+    fun updateData(newItems: List<String>) {
+        items = newItems
+        notifyDataSetChanged()
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.grid_image_item, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        // Load images with Picasso or another image loading library
+        Picasso.get().load(items[position]).into(holder.imageView)
+    }
+
+    override fun getItemCount() = items.size
+
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val imageView: ImageView = view.findViewById(R.id.imageView) // This is the id from your grid_image_item.xml
+    }
+}
+
+class GridSpacingItemDecoration(
+    private val spanCount: Int,
+    private val spacing: Int // assuming this is 2px
+) : RecyclerView.ItemDecoration() {
+
+    override fun getItemOffsets(
+        outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State
+    ) {
+        val position = parent.getChildAdapterPosition(view) // item position
+        val column = position % spanCount // item column
+
+        if (position >= spanCount) {
+            outRect.top = spacing // Add top margin to all items except the first row
+        }
+        if (column < spanCount - 1) {
+            outRect.right = spacing // Add right margin to all items except the last column
+        }
+    }
+}
+
+
+
