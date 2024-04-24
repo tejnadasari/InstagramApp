@@ -82,14 +82,22 @@ class UserHomeActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         recyclerView = findViewById(R.id.rvPosts)
         recyclerView.layoutManager = LinearLayoutManager(this)
-//        postAdapter = PostAdapter(posts)
-        postAdapter = PostAdapter(posts) { post ->
+//        postAdapter = PostAdapter(posts) { post ->
+//            val intent = Intent(this, UserPostDetailActivity::class.java).apply {
+//                putExtra("Post", post)
+//            }
+//            postDetailResultLauncher.launch(intent)
+//        }
+        postAdapter = PostAdapter(posts, { post ->
             val intent = Intent(this, UserPostDetailActivity::class.java).apply {
                 putExtra("Post", post)
             }
             postDetailResultLauncher.launch(intent)
-//            startActivity(intent)
-        }
+        }, { username ->
+            val intent = Intent(this, UserProfileActivity::class.java)
+            intent.putExtra("Username", username)
+            startActivity(intent)
+        })
         recyclerView.adapter = postAdapter
         postAdapter.notifyDataSetChanged()
     }

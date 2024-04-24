@@ -12,7 +12,7 @@ import com.example.instagramapplication.UserPostDetailActivity
 import com.example.instagramapplication.models.Post
 import com.squareup.picasso.Picasso
 
-class PostAdapter(private val posts: List<Post>, private val onPostClick: (Post) -> Unit) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
+class PostAdapter(private val posts: List<Post>, private val onPostClick: (Post) -> Unit, private val onUsernameClick: (String) -> Unit) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
     inner class PostViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvUserName: TextView = view.findViewById(R.id.tvUserName)
@@ -22,7 +22,7 @@ class PostAdapter(private val posts: List<Post>, private val onPostClick: (Post)
         val tvLikeCount: TextView = view.findViewById(R.id.tvLikeCount)
 
         init {
-            itemView.setOnClickListener {
+            imgPostImage.setOnClickListener {
                 // Use adapterPosition to get the clicked item from the list
                 val post = posts[adapterPosition]
                 onPostClick(post)
@@ -42,13 +42,16 @@ class PostAdapter(private val posts: List<Post>, private val onPostClick: (Post)
         holder.tvLikeCount.text = "${post.likes} likes"
         Picasso.get().load(post.imageUrl).into(holder.imgPostImage)
 
-        holder.itemView.setOnClickListener {
+        holder.imgPostImage.setOnClickListener {
             val context = it.context
             val intent = Intent(context, UserPostDetailActivity::class.java).apply {
                 putExtra("Post", post)
             }
             context.startActivity(intent)
+        }
 
+        holder.tvUserName.setOnClickListener {
+            onUsernameClick(post.userName)
         }
     }
 

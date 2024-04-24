@@ -9,6 +9,7 @@ import android.provider.MediaStore
 import android.widget.Button
 import android.Manifest
 import android.content.Context
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -30,6 +31,21 @@ class UserProfileActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.user_profile)
+
+
+        val username = intent.getStringExtra("Username")
+        val currentUserUsername = getUsernameFromSharedPreferences()
+
+        if (username != null && username != currentUserUsername) {
+            val btnAddPost = findViewById<Button>(R.id.btnAddPost)
+            btnAddPost.isEnabled = false
+            btnAddPost.visibility = View.GONE
+
+            loadOtherUserProfile(username)
+        } else {
+            // Load the current user's profile
+            loadProfile()
+        }
 
         cameraResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK) {
@@ -71,6 +87,25 @@ class UserProfileActivity : AppCompatActivity() {
         // Code to load the user's profile data
     }
 
+    private fun loadOtherUserProfile(username: String) {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("users").whereEqualTo("username", username).get()
+            .addOnSuccessListener { documents ->
+                if (documents.isEmpty) {
+                    Toast.makeText(this, "User not found", Toast.LENGTH_SHORT).show()
+                } else {
+                    for (document in documents) {
+                        // Here you can update UI with user profile details
+                        // For example: updateProfileUI(document.toObject(User::class.java))
+                    }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Toast.makeText(this, "Error getting user details: ${exception.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+
     private fun onMessageClick() {
         // Navigate to the message screen
         val intent = Intent(this, ChatActivity::class.java)
@@ -78,33 +113,26 @@ class UserProfileActivity : AppCompatActivity() {
     }
 
     private fun onSettingsClick() {
-        // Navigate to the settings screen
-//        val intent = Intent(this, SettingsActivity::class.java)
-//        startActivity(intent)
+
     }
 
     private fun onFeedClick() {
-        // Navigate to the feed/home screen
         val intent = Intent(this, UserHomeActivity::class.java)
         startActivity(intent)
     }
 
     private fun onShopClick() {
-        // Navigate to the shop screen
-        // You need to create a ShopActivity and replace 'ShopActivity::class.java' with the actual class name
         val intent = Intent(this, ShopActivity::class.java)
         startActivity(intent)
     }
 
     private fun onProfileClick() {
-        // Refresh the profile screen by restarting the UserProfileActivity
         val intent = Intent(this, UserProfileActivity::class.java)
         startActivity(intent)
         finish()
     }
 
     private fun onAddPostClick() {
-        // Show a dialog to ask the user if they want to use the camera or upload from gallery
         val options = arrayOf("Take Photo", "Choose from Gallery", "Cancel")
         AlertDialog.Builder(this).setItems(options) { dialog, which ->
             when (options[which]) {
