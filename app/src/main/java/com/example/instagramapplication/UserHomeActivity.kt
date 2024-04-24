@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,9 +20,26 @@ class UserHomeActivity : AppCompatActivity() {
     private lateinit var postAdapter: PostAdapter
     var posts = mutableListOf<Post>()
 
+    private lateinit var postDetailResultLauncher: ActivityResultLauncher<Intent>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.user_home)
+
+        postDetailResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                // Retrieve the updated post
+                val updatedPost = result.data?.getParcelableExtra<Post>("UpdatedPost")
+                updatedPost?.let {
+                    // Update the posts list and the adapter
+                    val index = posts.indexOfFirst { it.postId == updatedPost.postId }
+                    if (index != -1) {
+                        posts[index] = updatedPost
+                        postAdapter.notifyItemChanged(index)
+                    }
+                }
+            }
+        }
 
         getAllPosts()
         setupRecyclerView()
@@ -65,10 +84,11 @@ class UserHomeActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 //        postAdapter = PostAdapter(posts)
         postAdapter = PostAdapter(posts) { post ->
-            val intent = Intent(this, UserPostDetailActivity::class.java)
-            // Assuming Post class is Parcelable or Serializable
-            intent.putExtra("Post", post)
-            startActivity(intent)
+            val intent = Intent(this, UserPostDetailActivity::class.java).apply {
+                putExtra("Post", post)
+            }
+            postDetailResultLauncher.launch(intent)
+//            startActivity(intent)
         }
         recyclerView.adapter = postAdapter
         postAdapter.notifyDataSetChanged()

@@ -90,6 +90,12 @@ class UserPostDetailActivity : AppCompatActivity() {
             null
         }.addOnSuccessListener {
             Toast.makeText(this, "Liked!", Toast.LENGTH_SHORT).show()
+
+            // Set the result with the updated post
+            val data = Intent().apply {
+                putExtra("UpdatedPost", post)
+            }
+            setResult(RESULT_OK, data)
         }.addOnFailureListener { e ->
             Toast.makeText(this, "Failed to like: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
         }
