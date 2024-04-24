@@ -16,13 +16,7 @@ class UserHomeActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var postAdapter: PostAdapter
-    //    private var posts: List<Post> = listOf(
-//        Post("12", "Alice", "New York", 150, "https://example.com/image1.jpg"),
-//        Post("123", "Bob", "San Francisco", 95, "https://example.com/image2.jpg"),
-//        Post("1234", "Charlie", "London", 200, "https://example.com/image3.jpg")
-//    ) // Example posts
-    val allPosts = mutableListOf<Post>()
-    val posts = mutableListOf<Post>()
+    var posts = mutableListOf<Post>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,32 +29,49 @@ class UserHomeActivity : AppCompatActivity() {
 
     fun getAllPosts() {
         val usersCollection = FirebaseFirestore.getInstance().collection("users")
-
         usersCollection.get().addOnSuccessListener { userDocuments ->
+            var totalPostsToFetch = 0
+            var fetchedPostsCount = 0
+
+            if (userDocuments.isEmpty) {
+                postAdapter.notifyDataSetChanged()
+            }
+
             for (userDocument in userDocuments) {
                 val postsCollection = usersCollection.document(userDocument.id).collection("posts")
                 postsCollection.get().addOnSuccessListener { postDocuments ->
+                    totalPostsToFetch += postDocuments.size()
                     for (postDocument in postDocuments) {
-                        val post = postDocument.toObject(Post::class.java).apply {
-                            postId = postDocument.id // Ensure you have postId as part of your Post data class
+                        var post = postDocument.toObject(Post::class.java).apply {
+                            postId = postDocument.id
                         }
-                        allPosts.add(post)
                         posts.add(post)
+                        fetchedPostsCount++
+                        if (fetchedPostsCount == totalPostsToFetch) {
+                            postAdapter.notifyDataSetChanged()
+                        }
                     }
                 }.addOnFailureListener { e ->
-                    Log.e("getAllPosts", "Error getting posts for user ${userDocument.id}", e)
+                    Log.e("getAllPosts", "Error getting posts for user ${userDocument.id}: ${e.toString()}")
                 }
             }
         }.addOnFailureListener { e ->
-            Log.e("getAllPosts", "Error getting users", e)
+            Log.e("getAllPosts", "Error getting users: ${e.toString()}")
         }
     }
 
     private fun setupRecyclerView() {
         recyclerView = findViewById(R.id.rvPosts)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        postAdapter = PostAdapter(posts)
+//        postAdapter = PostAdapter(posts)
+        postAdapter = PostAdapter(posts) { post ->
+            val intent = Intent(this, UserPostDetailActivity::class.java)
+            // Assuming Post class is Parcelable or Serializable
+            intent.putExtra("Post", post)
+            startActivity(intent)
+        }
         recyclerView.adapter = postAdapter
+        postAdapter.notifyDataSetChanged()
     }
 
     private fun setupNavigationBar() {

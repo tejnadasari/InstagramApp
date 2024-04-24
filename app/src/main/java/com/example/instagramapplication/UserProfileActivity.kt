@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Button
 import android.Manifest
+import android.content.Context
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -183,7 +184,13 @@ class UserProfileActivity : AppCompatActivity() {
         }
     }
 
+    private fun getUsernameFromSharedPreferences(): String {
+        val prefs = getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+        return prefs.getString("username", "Anonymous") ?: "Anonymous"
+    }
+
     private fun savePostToFirestore(userId: String, imageUrl: String) {
+        val username = getUsernameFromSharedPreferences()
         val db = FirebaseFirestore.getInstance()
         val userPostsRef = db.collection("users").document(userId).collection("posts")
 
@@ -191,7 +198,7 @@ class UserProfileActivity : AppCompatActivity() {
             "imageUrl" to imageUrl,
             "location" to "Unknown Location",
             "likes" to 0,
-            "userName" to "Username Placeholder"
+            "userName" to username
         )
 
         userPostsRef.add(newPost).addOnSuccessListener {

@@ -8,18 +8,26 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.instagramapplication.R
-//import com.example.instagramapplication.UserPostDetailActivity
+import com.example.instagramapplication.UserPostDetailActivity
 import com.example.instagramapplication.models.Post
 import com.squareup.picasso.Picasso
 
-class PostAdapter(private val posts: List<Post>) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
+class PostAdapter(private val posts: List<Post>, private val onPostClick: (Post) -> Unit) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
-    class PostViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class PostViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvUserName: TextView = view.findViewById(R.id.tvUserName)
         val tvLocation: TextView = view.findViewById(R.id.tvLocation)
         val imgPostImage: ImageView = view.findViewById(R.id.imgPostImage)
         val icHeart: ImageView = view.findViewById(R.id.icHeart)
         val tvLikeCount: TextView = view.findViewById(R.id.tvLikeCount)
+
+        init {
+            itemView.setOnClickListener {
+                // Use adapterPosition to get the clicked item from the list
+                val post = posts[adapterPosition]
+                onPostClick(post)
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
@@ -33,16 +41,15 @@ class PostAdapter(private val posts: List<Post>) : RecyclerView.Adapter<PostAdap
         holder.tvLocation.text = post.location
         holder.tvLikeCount.text = "${post.likes} likes"
         Picasso.get().load(post.imageUrl).into(holder.imgPostImage)
-//        Picasso.get().load(post.imageUrl).into(holder.imgPostImage)
-//
-//        holder.itemView.setOnClickListener {
-//            val context = it.context
-//            val intent = Intent(context, UserPostDetailActivity::class.java).apply {
-//                putExtra("Post", post)
-//            }
-//            context.startActivity(intent)
-//
-//        }
+
+        holder.itemView.setOnClickListener {
+            val context = it.context
+            val intent = Intent(context, UserPostDetailActivity::class.java).apply {
+                putExtra("Post", post)
+            }
+            context.startActivity(intent)
+
+        }
     }
 
     override fun getItemCount() = posts.size

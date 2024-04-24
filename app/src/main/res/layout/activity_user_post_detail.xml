@@ -40,11 +40,15 @@
         android:text="123 likes"
         android:padding="8dp" />
 
-    <ImageView
-        android:id="@+id/shareButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:src="@android:drawable/star_on"/>
+    <Button
+            android:id="@+id/shareButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Share"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:background="?attr/colorPrimary"
+            android:textColor="#FFFFFF"
+            android:onClick="onSettingsClick"/>
 
 </RelativeLayout>
