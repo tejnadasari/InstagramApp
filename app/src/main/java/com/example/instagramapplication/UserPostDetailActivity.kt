@@ -62,6 +62,40 @@ class UserPostDetailActivity : AppCompatActivity() {
                 incrementLikeCount()
             }
         }
+
+        setupButtonListeners()
+    }
+
+    private fun setupButtonListeners() {
+        findViewById<Button>(R.id.btnFeed).setOnClickListener {
+            onFeedClick()
+        }
+        findViewById<Button>(R.id.btnShop).setOnClickListener {
+            onShopClick()
+        }
+        findViewById<Button>(R.id.btnProfile).setOnClickListener {
+            onProfileClick()
+        }
+    }
+
+    private fun onFeedClick() {
+        // Navigate to the feed/home screen
+        val intent = Intent(this, UserHomeActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun onShopClick() {
+        // Navigate to the shop screen
+        // You need to create a ShopActivity and replace 'ShopActivity::class.java' with the actual class name
+        val intent = Intent(this, ShopActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun onProfileClick() {
+        // Refresh the profile screen by restarting the UserProfileActivity
+        val intent = Intent(this, UserProfileActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
     private fun incrementLikeCount() {
