@@ -10,25 +10,17 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:text="Message"
+        android:text="Chat"
         android:onClick="onMessageClick" />
-
-    <Button
-        android:id="@+id/btnSettings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:text="Settings"
-        android:onClick="onSettingsClick" />
 
     <ImageView
         android:id="@+id/profilePicture"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_below="@id/btnMessage"
-        android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_alignParentStart="true"
         android:src="@drawable/circular_placeholder" />
 
     <LinearLayout
@@ -62,7 +54,8 @@
         android:layout_toEndOf="@id/profilePicture"
         android:layout_marginStart="16dp"
         android:text="Followers"
-        android:layout_alignTop="@id/profilePicture" />
+        android:layout_alignTop="@id/profilePicture"
+        android:layout_alignBottom="@id/profilePicture" />
 
     <TextView
         android:id="@+id/followingCount"
@@ -71,7 +64,8 @@
         android:layout_toEndOf="@id/followerCount"
         android:layout_marginStart="16dp"
         android:text="Following"
-        android:layout_alignTop="@id/followerCount" />
+        android:layout_alignTop="@id/followerCount"
+        android:layout_alignBottom="@id/followerCount" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/postsRecyclerView"

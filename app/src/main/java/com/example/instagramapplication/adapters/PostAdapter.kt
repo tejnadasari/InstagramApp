@@ -23,7 +23,6 @@ class PostAdapter(private val posts: List<Post>, private val onPostClick: (Post)
 
         init {
             imgPostImage.setOnClickListener {
-                // Use adapterPosition to get the clicked item from the list
                 val post = posts[adapterPosition]
                 onPostClick(post)
             }

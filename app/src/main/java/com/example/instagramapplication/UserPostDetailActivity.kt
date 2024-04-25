@@ -27,10 +27,8 @@ class UserPostDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_post_detail)
 
-        // Retrieve the Post object passed with intent
         post = intent.getParcelableExtra<Post>("Post") ?: return
 
-        // Initialize views
         val postImageView = findViewById<ImageView>(R.id.postImageView)
         val userNameTextView = findViewById<TextView>(R.id.tvUserName)
         val locationTextView = findViewById<TextView>(R.id.tvLocation)
@@ -38,9 +36,7 @@ class UserPostDetailActivity : AppCompatActivity() {
         val likeButtonImageView = findViewById<ImageView>(R.id.likeButton)
         val shareButton = findViewById<Button>(R.id.shareButton)
 
-        // Populate the views with the Post data
         post?.let {
-            // Picasso.get().load(it.imageUrl).into(postImageView)
             Picasso.get().load(it.imageUrl).into(postImageView, object : com.squareup.picasso.Callback {
                 override fun onSuccess() {
                     shareButton.setOnClickListener {
@@ -57,7 +53,6 @@ class UserPostDetailActivity : AppCompatActivity() {
             locationTextView.text = it.location
             likesCountTextView.text = "${it.likes} likes"
 
-            // TODO: Set onClickListener for the like button
             likeButtonImageView.setOnClickListener {
                 incrementLikeCount()
             }
@@ -79,53 +74,42 @@ class UserPostDetailActivity : AppCompatActivity() {
     }
 
     private fun onFeedClick() {
-        // Navigate to the feed/home screen
         val intent = Intent(this, UserHomeActivity::class.java)
         startActivity(intent)
     }
 
     private fun onShopClick() {
-        // Navigate to the shop screen
-        // You need to create a ShopActivity and replace 'ShopActivity::class.java' with the actual class name
         val intent = Intent(this, ShopActivity::class.java)
         startActivity(intent)
     }
 
     private fun onProfileClick() {
-        // Refresh the profile screen by restarting the UserProfileActivity
         val intent = Intent(this, UserProfileActivity::class.java)
         startActivity(intent)
         finish()
     }
 
     private fun incrementLikeCount() {
-        // Get the current user's ID
         val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
-        // Reference to the post's document
         val postRef = FirebaseFirestore.getInstance()
             .collection("users")
             .document(userId)
             .collection("posts")
             .document(post.postId)
 
-        // Increment likes in Firestore transaction
         FirebaseFirestore.getInstance().runTransaction { transaction ->
             val snapshot = transaction.get(postRef)
             val newLikeCount = snapshot.getLong("likes")?.plus(1) ?: 1L // Start at 1 if null
             transaction.update(postRef, "likes", newLikeCount)
 
-            // Update the local post object and UI
             post.likes = newLikeCount.toInt()
-            // Note: UI updates must be run on the UI thread
             runOnUiThread {
                 findViewById<TextView>(R.id.tvLikesCount).text = "${post.likes} likes"
             }
-            // Success
             null
         }.addOnSuccessListener {
             Toast.makeText(this, "Liked!", Toast.LENGTH_SHORT).show()
 
-            // Set the result with the updated post
             val data = Intent().apply {
                 putExtra("UpdatedPost", post)
             }
@@ -133,11 +117,6 @@ class UserPostDetailActivity : AppCompatActivity() {
         }.addOnFailureListener { e ->
             Toast.makeText(this, "Failed to like: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
         }
-    }
-    // You may want to create a method to update the likes on the UI and Firestore
-    private fun updateLikes(post: Post) {
-        // Code to update the like count in Firestore
-        // Update the likesCountTextView to reflect new likes
     }
 
 private fun sharePost(image: Bitmap?) {

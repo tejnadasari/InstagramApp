@@ -13,7 +13,6 @@ import com.google.firebase.auth.FirebaseUser
 class MainActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
-    // Declare emailEditText and passwordEditText as class members
     private lateinit var emailEditText: EditText
     private lateinit var passwordEditText: EditText
 
@@ -24,7 +23,6 @@ class MainActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
-        // Initialize the EditTexts as member variables
         emailEditText = findViewById<EditText>(R.id.username)
         passwordEditText = findViewById<EditText>(R.id.password)
         val signInButton = findViewById<Button>(R.id.submit_button)

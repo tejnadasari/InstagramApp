@@ -20,7 +20,7 @@ class MessageAdapter : ListAdapter<Message, MessageAdapter.MessageViewHolder>(Me
     class MessageViewHolder(private val binding: ItemMessageBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(message: Message) {
             binding.message = message
-            binding.executePendingBindings()  // This ensures that the binding has been executed immediately after modifying the data.
+            binding.executePendingBindings()
         }
     }
 
